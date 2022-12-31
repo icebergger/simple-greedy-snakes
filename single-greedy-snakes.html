@@ -1,0 +1,144 @@
+<html>
+	<div id="hiddensnake" style="border-style:solid;background-color:brown;position:absolute;display:none;"></div>
+	<div id="area" style="height:600px;width:1000px;border-style:solid;position:absolute;" onkeydown="change_direction()">
+		<div id="cake" style="height:10px;width:10px;border-style:solid;background-color:pink; position: absolute;"></div>
+	</div>
+	<div id="snakesize" style="position:absolute; left:1100px; width:100px"></div>
+</html>
+<script>
+
+var width = 10;
+
+var direction = 2; // 1:up, 2:right, 3:down, 4:left
+
+var snake_top_arr =  [100];
+var snake_left_arr = [100];
+
+var cake = [0,0];
+
+init();
+setInterval(function(){display()}, 500);
+
+function init() {
+    // document.getElementById("snake").style.left=snake_head[0];
+	// document.getElementById("snake").style.top=snake_head[1];
+	// draw_snake(0, snake_top[0], snake_left[0], snake_len[0], snake_dir[0]);
+	draw();
+	make_cake();
+	document.addEventListener("keydown",change_direction);
+
+}
+
+function make_cake() {
+	var left = Math.round(Math.random()*90)*width;
+	var top  = Math.round(Math.random()*50)*width;
+	console.log("left:"+left + ", top:"+top)
+	document.getElementById("cake").style.left=left;
+	document.getElementById("cake").style.top=top;
+	cake[0] = top;
+	cake[1] = left;
+}
+
+function display() {
+	move();
+	draw();
+}
+
+function move() {
+	// var left = document.getElementById("snake").offsetLeft;
+	// var top = document.getElementById("snake").offsetTop;
+	// console.log("left:" + left + ", top:"+top + ", direction:"+direction);
+	switch(direction)
+	{
+	    case 1: //向上
+	    	snake_top_arr.push(snake_top_arr[snake_top_arr.length-1]-width);
+			snake_left_arr.push(snake_left_arr[snake_left_arr.length-1]);
+	        break;
+	    case 2: //向右
+	    	// console.log("left:" + left + ", top:"+top + ", direction:"+direction + ", new_left:" + new_left);
+	    	snake_top_arr.push(snake_top_arr[snake_top_arr.length-1]);
+			snake_left_arr.push(snake_left_arr[snake_left_arr.length-1]+width);
+	        break;
+	    case 3: //向下
+	    	snake_top_arr.push(snake_top_arr[snake_top_arr.length-1]+width);
+			snake_left_arr.push(snake_left_arr[snake_left_arr.length-1]);
+	        break;
+	    case 4: //向左
+	    	snake_top_arr.push(snake_top_arr[snake_top_arr.length-1]);
+			snake_left_arr.push(snake_left_arr[snake_left_arr.length-1]-width);
+	        break;
+	    default:
+	        console.log("err direction");
+	}
+
+	if (cake[0] == snake_top_arr[snake_top_arr.length-1] && cake[1] == snake_left_arr[snake_left_arr.length-1]) {
+		make_cake();
+	} else {
+		snake_top_arr.shift();
+		snake_left_arr.shift();		
+	}
+
+
+
+
+}
+
+function draw() {
+	var snakes = document.getElementsByName("newsnake");
+	if (snakes != null) {
+		for (var i = snakes.length - 1; i >= 0; i--) {
+			snakes[i].remove();
+		}
+	}
+
+	for (var i = snake_top_arr.length - 1; i >= 0; i--) {
+		draw_snake(snake_top_arr[i], snake_left_arr[i]);
+	}
+
+	document.getElementById("snakesize").innerHTML = "吃了几个: "+snake_top_arr.length;
+}
+
+function draw_snake(top, left) {
+	var newsnake = document.getElementById("hiddensnake").cloneNode(true);
+	newsnake.setAttribute("name","newsnake");
+	newsnake.id = "";
+	newsnake.style.display = "block";
+	newsnake.style.top = top;
+	newsnake.style.left = left;
+	newsnake.style.width = width;
+	newsnake.style.height = width;
+	document.getElementById("area").appendChild(newsnake);
+
+}
+
+function change_direction(event) {
+	console.log(event.keyCode);
+    switch(event.keyCode){
+        case 37: // 左转
+            if (direction == 1 || direction == 3) {
+            	direction = 4;
+            }
+            break;
+        case 38: // 上转
+            if (direction == 2 || direction == 4) {
+            	direction = 1;
+            }
+            break;
+        case 39: // 右转
+            if (direction == 1 || direction == 3) {
+            	direction = 2;
+            }
+            break;
+        case 40: // 下转
+            if (direction == 2 || direction == 4) {
+            	direction = 3;
+            }
+            break;
+	    default:
+	        console.log("not change direction");
+    }
+}
+
+
+</script>
+
